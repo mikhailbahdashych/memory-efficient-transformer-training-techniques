@@ -15,6 +15,7 @@ try:
     from flash_attn import flash_attn_func
     FLASH_ATTN_AVAILABLE = True
 except ImportError:
+    print("Flash attention is not available!")
     FLASH_ATTN_AVAILABLE = False
 
 
@@ -221,13 +222,17 @@ class TransformerDecoderLayer(nn.Module):
         Returns:
             Output tensor (batch_size, seq_len, d_model)
         """
-        # Self-attention with residual connection and layer norm
-        attn_output = self.self_attn(x, x, x, mask)
-        x = self.norm1(x + self.dropout1(attn_output))
+        # Pre-LayerNorm: normalize BEFORE attention (more stable training)
+        # Self-attention with residual connection
+        x_norm = self.norm1(x)
+        attn_output = self.self_attn(x_norm, x_norm, x_norm, mask)
+        x = x + self.dropout1(attn_output)
 
-        # Feed-forward with residual connection and layer norm
-        ff_output = self.feed_forward(x)
-        x = self.norm2(x + self.dropout2(ff_output))
+        # Pre-LayerNorm: normalize BEFORE feed-forward
+        # Feed-forward with residual connection
+        x_norm = self.norm2(x)
+        ff_output = self.feed_forward(x_norm)
+        x = x + self.dropout2(ff_output)
 
         return x
 
@@ -292,6 +297,9 @@ class TransformerLanguageModel(nn.Module):
             for _ in range(num_layers)
         ])
 
+        # Final layer normalization (required for Pre-LN architecture)
+        self.final_norm = nn.LayerNorm(d_model)
+
         # Output projection
         self.output_projection = nn.Linear(d_model, vocab_size)
 
@@ -302,10 +310,38 @@ class TransformerLanguageModel(nn.Module):
         self._init_weights()
 
     def _init_weights(self):
-        """Initialize weights."""
-        for p in self.parameters():
-            if p.dim() > 1:
-                nn.init.xavier_uniform_(p)
+        """
+        Initialize weights with improved strategy for better training.
+        Based on GPT-2 initialization.
+        """
+        # Initialize embedding layers
+        nn.init.normal_(self.embedding.weight, mean=0.0, std=0.02)
+
+        # Initialize all linear layers
+        for module in self.modules():
+            if isinstance(module, nn.Linear):
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+                if module.bias is not None:
+                    nn.init.zeros_(module.bias)
+            elif isinstance(module, nn.LayerNorm):
+                nn.init.ones_(module.weight)
+                nn.init.zeros_(module.bias)
+
+        # Special scaled init for residual projections (GPT-2 style)
+        # Scale down the output projection in each layer
+        for layer_idx, layer in enumerate(self.layers):
+            # Scale attention output projection
+            nn.init.normal_(
+                layer.self_attn.W_o.weight,
+                mean=0.0,
+                std=0.02 / math.sqrt(2 * self.num_layers)
+            )
+            # Scale feed-forward output projection
+            nn.init.normal_(
+                layer.feed_forward.linear2.weight,
+                mean=0.0,
+                std=0.02 / math.sqrt(2 * self.num_layers)
+            )
 
     def gradient_checkpointing_enable(self):
         """Enable gradient checkpointing to save memory."""
@@ -356,6 +392,9 @@ class TransformerLanguageModel(nn.Module):
                 x = torch.utils.checkpoint.checkpoint(layer, x, mask, use_reentrant=False)
             else:
                 x = layer(x, mask)
+
+        # Final layer normalization (Pre-LN pattern)
+        x = self.final_norm(x)
 
         # Project to vocabulary
         logits = self.output_projection(x)

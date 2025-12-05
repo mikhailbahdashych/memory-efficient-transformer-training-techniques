@@ -1,4 +1,4 @@
-# Lab 4: Memory-Efficient Transformer Training Techniques
+# Memory-Efficient Transformer Training Techniques
 
 **Complete implementation** of memory optimization techniques for Transformer training, comparing their impact on GPU memory usage, batch size capacity, training speed, and model performance.
 
@@ -22,7 +22,7 @@
 
 ## Overview
 
-This lab systematically compares **5 memory optimization techniques** for Transformer training:
+This project systematically compares **5 memory optimization techniques** for Transformer training:
 
 1. **Baseline (FP32/TF32)** - Full precision training
 2. **BF16 Mixed Precision** - Automatic mixed precision with bfloat16
@@ -423,7 +423,7 @@ ff_dim: int = 2048        # Feed-forward dimension
 batch_size: int = 64      # Batch size
 max_seq_length: int = 512 # Sequence length
 learning_rate: float = 0.001
-num_epochs: int = 1       # Lab 4: 1 epoch only
+num_epochs: int = 1
 ```
 
 ### Data Processing
@@ -495,35 +495,6 @@ ImportError: cannot import name 'flash_attn_func'
 1. Check `results/` directory exists
 2. Verify experiments completed successfully
 3. Look for `*_metrics.json` files in `results/`
-
----
-
-## Report Requirements
-
-For the Lab 4 report, include:
-
-### 1. Experimental Setup
-- Dataset description (size, domain)
-- Model architecture (layers, dimensions)
-- Hardware (GPU model, memory)
-
-### 2. Results Tables
-Use output from `compare_results.py`:
-- Comparison table with all metrics
-- Memory usage comparison
-- Optimization techniques summary
-
-### 3. Analysis
-- Which technique is most effective?
-- Memory vs speed vs accuracy trade-offs
-- Why some techniques reduce memory more
-- Why some techniques slow down training
-- Recommendations for different scenarios
-
-### 4. Visualizations (Optional)
-- Memory usage bar charts
-- Training time comparison
-- Perplexity vs memory scatter plot
 
 ---
 

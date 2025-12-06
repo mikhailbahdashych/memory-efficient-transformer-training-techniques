@@ -92,13 +92,18 @@ class TransformerConfig(Config):
                 f"emb={self.embedding_dim}, ff={self.ff_dim}){opt_str}")
 
 
-def get_config() -> TransformerConfig:
+def get_config(config_type: str = "transformer") -> TransformerConfig:
     """
     Get Transformer configuration for Lab 4.
+
+    Args:
+        config_type: Type of configuration (only 'transformer' is supported)
 
     Returns:
         TransformerConfig object
     """
+    if config_type != "transformer":
+        raise ValueError(f"Only 'transformer' config is supported in Lab 4, got: {config_type}")
     return TransformerConfig()
 
 

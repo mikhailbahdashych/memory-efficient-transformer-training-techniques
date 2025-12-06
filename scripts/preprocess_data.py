@@ -12,7 +12,7 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.config import get_config
-from utils.tokenizer import PolishTokenizer
+from utils.tokenizer import create_tokenizer
 from utils.dataset import load_text_file, load_jsonl_file, split_data
 
 
@@ -21,6 +21,7 @@ def preprocess_data(
     config_type: str = "rnn",
     file_type: str = "txt",
     text_field: str = "text",
+    tokenizer_type: str = None,
 ):
     """
     Preprocess data: load, tokenize, and save.
@@ -30,6 +31,7 @@ def preprocess_data(
         config_type: Type of config ('rnn' or 'transformer')
         file_type: Type of input file ('txt' or 'jsonl')
         text_field: Field name for JSONL files
+        tokenizer_type: Type of tokenizer ('bpe' or 'gpt2'), if None uses config default
     """
     print("=" * 80)
     print("DATA PREPROCESSING")
@@ -41,9 +43,15 @@ def preprocess_data(
     # Load configuration
     config = get_config(config_type)
     config.dataset_name = dataset_name
+
+    # Override tokenizer type if specified
+    if tokenizer_type is not None:
+        config.tokenizer_type = tokenizer_type
+
     print(f"\nDataset: {dataset_name}")
     print(f"Configuration: {config}")
     print(f"Device: {config.device}")
+    print(f"Tokenizer type: {config.tokenizer_type}")
 
     # Load raw text data
     print(f"\nLoading data from {input_file}...")
@@ -69,8 +77,8 @@ def preprocess_data(
     print(f"Train: {len(train_texts)} | Val: {len(val_texts)} | Test: {len(test_texts)}")
 
     # Train tokenizer on training data
-    print(f"\nTraining tokenizer (vocab_size={config.vocab_size})...")
-    tokenizer = PolishTokenizer(vocab_size=config.vocab_size)
+    print(f"\nCreating tokenizer (type={config.tokenizer_type}, vocab_size={config.vocab_size})...")
+    tokenizer = create_tokenizer(config.tokenizer_type, vocab_size=config.vocab_size)
     tokenizer.train(train_texts)
 
     # Save tokenizer
@@ -120,7 +128,8 @@ def preprocess_data(
         "num_train": len(train_ids),
         "num_val": len(val_ids),
         "num_test": len(test_ids),
-        "vocab_size": config.vocab_size,
+        "tokenizer_type": config.tokenizer_type,
+        "vocab_size": tokenizer.vocab_size,
         "avg_train_len": avg_train_len,
         "avg_val_len": avg_val_len,
         "avg_test_len": avg_test_len,
@@ -168,6 +177,13 @@ def main():
         default="text",
         help="Field name for JSONL files",
     )
+    parser.add_argument(
+        "--tokenizer-type",
+        type=str,
+        default=None,
+        choices=["bpe", "gpt2"],
+        help="Type of tokenizer to use (default: uses config default 'bpe')",
+    )
 
     args = parser.parse_args()
 
@@ -181,6 +197,7 @@ def main():
         config_type=args.config,
         file_type=args.file_type,
         text_field=args.text_field,
+        tokenizer_type=args.tokenizer_type,
     )
 
 

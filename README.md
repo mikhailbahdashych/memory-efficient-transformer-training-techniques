@@ -32,7 +32,7 @@ This project systematically compares **5 memory optimization techniques** for Tr
 
 **Model Configuration:**
 - Architecture: Transformer decoder (6 layers, 512 d_model, 8 heads, 2048 FFN)
-- Vocabulary: 10,000 BPE tokens
+- Tokenizer: BPE (10K vocab) or GPT-2 (50K vocab, pre-trained)
 - Sequence Length: 512 tokens
 - Dataset: Polish text from Speakleash corpus
 - Training: 1 epoch per experiment (for fair comparison)
@@ -53,7 +53,7 @@ This project systematically compares **5 memory optimization techniques** for Tr
 │   └── transformer_model.py          # Transformer with FlashAttention support
 ├── utils/
 │   ├── config.py                     # Configuration (GPU-optimized)
-│   ├── tokenizer.py                  # BPE tokenizer
+│   ├── tokenizer.py                  # BPE and GPT-2 tokenizers
 │   ├── dataset.py                    # PyTorch dataset
 │   ├── metrics.py                    # Evaluation metrics
 │   ├── memory_profiler.py            # GPU memory profiling
@@ -134,19 +134,40 @@ This downloads the dataset to `data/raw/shopping_1_general_corpus.txt`.
 
 Tokenize and prepare data for training:
 
+#### Option A: BPE Tokenizer (Default)
 ```bash
 python scripts/preprocess_data.py \
   --input data/raw/shopping_1_general_corpus.txt \
-  --file-type txt
+  --file-type txt \
+  --tokenizer-type bpe
+```
+
+#### Option B: GPT-2 Tokenizer (Pre-trained)
+```bash
+python scripts/preprocess_data.py \
+  --input data/raw/shopping_1_general_corpus.txt \
+  --file-type txt \
+  --tokenizer-type gpt2
 ```
 
 **What this does:**
 - Splits data into train (85%), val (10%), test (5%)
-- Trains BPE tokenizer (10k vocabulary)
+- Creates/loads tokenizer:
+  - **BPE**: Trains custom tokenizer with 10K vocabulary from training data
+  - **GPT-2**: Uses pre-trained GPT-2 tokenizer with 50K vocabulary
 - Tokenizes all splits
 - Saves to `data/processed/shopping_1_general_corpus_*`
 
 **Time estimate:** 5-15 minutes depending on dataset size
+
+**Tokenizer Comparison:**
+| Feature | BPE | GPT-2 |
+|---------|-----|-------|
+| Vocabulary Size | 10,000 (configurable) | 50,257 (fixed) |
+| Training Required | Yes (~5 min) | No (pre-trained) |
+| Domain Adaptation | Optimized for your corpus | General-purpose |
+| OOV Handling | May have unknown tokens | Better generalization |
+| Use Case | Domain-specific text | General Polish text |
 
 ---
 
@@ -428,7 +449,8 @@ num_epochs: int = 1
 
 ### Data Processing
 ```python
-vocab_size: int = 10000   # BPE vocabulary size
+vocab_size: int = 10000         # Vocabulary size (BPE only, GPT-2 is fixed at 50257)
+tokenizer_type: str = "bpe"     # "bpe" or "gpt2"
 train_split: float = 0.85
 val_split: float = 0.10
 test_split: float = 0.05
@@ -509,10 +531,18 @@ pip install flash-attn --no-build-isolation
 # 2. Download dataset
 python main.py shopping_1_general_corpus
 
-# 3. Preprocess
+# 3. Preprocess (choose tokenizer)
+# Option A: BPE tokenizer
 python scripts/preprocess_data.py \
   --input data/raw/shopping_1_general_corpus.txt \
-  --file-type txt
+  --file-type txt \
+  --tokenizer-type bpe
+
+# Option B: GPT-2 tokenizer
+python scripts/preprocess_data.py \
+  --input data/raw/shopping_1_general_corpus.txt \
+  --file-type txt \
+  --tokenizer-type gpt2
 
 # 4. Run all experiments
 python scripts/run_experiments.py

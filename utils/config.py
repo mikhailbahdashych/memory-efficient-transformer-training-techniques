@@ -33,6 +33,7 @@ class Config:
     test_split: float = 0.05
 
     # Tokenizer
+    tokenizer_type: str = "bpe"  # "bpe" or "gpt2"
     min_frequency: int = 2
 
     # Training hyperparameters (GPU-optimized)

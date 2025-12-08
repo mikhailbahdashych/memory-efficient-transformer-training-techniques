@@ -37,7 +37,7 @@ class Config:
     min_frequency: int = 2
 
     # Training hyperparameters (GPU-optimized)
-    batch_size: int = 256  # Increased to utilize GPU better (5GB/34GB usage was too low)
+    batch_size: int = 128  # Increased to utilize GPU better (5GB/34GB usage was too low)
     num_epochs: int = 1  # Lab 4: Only train for 1 epoch
     learning_rate: float = 0.001
     weight_decay: float = 0.01
@@ -47,7 +47,7 @@ class Config:
     save_every_n_epochs: int = 1
 
     # Evaluation
-    eval_batch_size: int = 256  # Match training batch size
+    eval_batch_size: int = 128  # Match training batch size
 
     # Data loading (optimize for GPU training speed)
     num_workers: int = 4  # Parallel data loading to reduce CPU bottleneck

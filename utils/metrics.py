@@ -29,6 +29,7 @@ def evaluate_model(
     criterion: nn.Module,
     device: str,
     pad_token_id: Optional[int] = None,
+    use_bf16: bool = False,
 ) -> tuple[float, float]:
     """
     Evaluate model on a dataset.
@@ -39,6 +40,7 @@ def evaluate_model(
         criterion: Loss function
         device: Device to run on
         pad_token_id: ID of padding token (to ignore in loss)
+        use_bf16: Use BF16 autocast (required if model uses FlashAttention)
 
     Returns:
         avg_loss, perplexity
@@ -52,8 +54,12 @@ def evaluate_model(
             inputs = inputs.to(device)
             targets = targets.to(device)
 
-            # Forward pass
-            outputs = model(inputs)
+            # Forward pass with optional BF16 autocast
+            if use_bf16:
+                with torch.amp.autocast('cuda', dtype=torch.bfloat16):
+                    outputs = model(inputs)
+            else:
+                outputs = model(inputs)
 
             # Reshape for loss calculation
             # outputs: (batch_size, seq_len, vocab_size)

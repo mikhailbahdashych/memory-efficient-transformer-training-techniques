@@ -176,10 +176,14 @@ def train(
     print(f"Val batches: {len(val_loader)}")
     print(f"Batch size: {config.batch_size}")
 
+    # Update vocab size from tokenizer (important for GPT-2 tokenizer with 50257 tokens)
+    actual_vocab_size = tokenizer.vocab_size
+    print(f"Vocabulary size: {actual_vocab_size}")
+
     # Initialize model
     print("\nInitializing model...")
     model = TransformerLanguageModel(
-        vocab_size=config.vocab_size,
+        vocab_size=actual_vocab_size,
         d_model=config.embedding_dim,
         num_heads=config.num_heads,
         num_layers=config.num_layers,

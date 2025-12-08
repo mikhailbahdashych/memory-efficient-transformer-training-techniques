@@ -108,6 +108,80 @@ def load_jsonl_file(file_path: Path, text_field: str = "text") -> List[str]:
 
 
 def create_dataloaders(
+    data_dir: Path,
+    dataset_name: str,
+    batch_size: int,
+    eval_batch_size: int,
+    max_length: int,
+    device: str,
+    num_workers: int = 0,
+):
+    """
+    Create dataloaders for training, validation, and testing.
+    Also loads and returns the tokenizer.
+
+    Args:
+        data_dir: Path to processed data directory
+        dataset_name: Name of the dataset (e.g., 'shopping_1_general_corpus')
+        batch_size: Batch size for training
+        eval_batch_size: Batch size for evaluation
+        max_length: Maximum sequence length
+        device: Device to use ('cuda', 'cpu', 'mps')
+        num_workers: Number of worker processes
+
+    Returns:
+        train_loader, val_loader, test_loader, tokenizer
+    """
+    from utils.tokenizer import load_tokenizer
+
+    # Load metadata to get tokenizer info
+    metadata_path = data_dir / f"{dataset_name}_metadata.json"
+    with open(metadata_path, 'r') as f:
+        metadata = json.load(f)
+
+    # Load tokenizer
+    tokenizer_path = data_dir / f"{dataset_name}_tokenizer.json"
+    tokenizer = load_tokenizer(tokenizer_path)
+
+    # Load token IDs
+    train_ids = torch.load(data_dir / f"{dataset_name}_train_ids.pt")
+    val_ids = torch.load(data_dir / f"{dataset_name}_val_ids.pt")
+    test_ids = torch.load(data_dir / f"{dataset_name}_test_ids.pt")
+
+    # Create datasets
+    train_dataset = LanguageModelingDataset(train_ids, max_length, tokenizer.pad_token_id)
+    val_dataset = LanguageModelingDataset(val_ids, max_length, tokenizer.pad_token_id)
+    test_dataset = LanguageModelingDataset(test_ids, max_length, tokenizer.pad_token_id)
+
+    # Create dataloaders
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=(device == 'cuda'),  # Only pin memory for CUDA
+    )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=eval_batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=(device == 'cuda'),
+    )
+
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=eval_batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=(device == 'cuda'),
+    )
+
+    return train_loader, val_loader, test_loader, tokenizer
+
+
+def create_dataloaders_from_ids(
     train_ids: List[List[int]],
     val_ids: List[List[int]],
     test_ids: List[List[int]],
@@ -117,7 +191,9 @@ def create_dataloaders(
     num_workers: int = 0,
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """
-    Create dataloaders for training, validation, and testing.
+    Create dataloaders from pre-loaded token IDs.
+
+    Legacy function for backward compatibility.
 
     Args:
         train_ids: Training token IDs

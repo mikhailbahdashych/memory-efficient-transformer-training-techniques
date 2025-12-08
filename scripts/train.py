@@ -242,7 +242,7 @@ def train(
     )
 
     print("\nEvaluating on validation set...")
-    val_loss = evaluate_model(
+    val_loss, val_ppl = evaluate_model(
         model=model,
         dataloader=val_loader,
         criterion=criterion,
@@ -251,7 +251,6 @@ def train(
     )
 
     train_ppl = calculate_perplexity(train_loss)
-    val_ppl = calculate_perplexity(val_loss)
 
     print("\n" + "=" * 80)
     print("TRAINING COMPLETE")

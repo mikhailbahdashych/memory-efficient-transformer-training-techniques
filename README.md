@@ -98,7 +98,7 @@ pip install flash-attn --no-build-isolation
 
 ```bash
 # Test CUDA availability
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"N/A\"}')"
+python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"N/A\"}'); print(torch.__version__)"
 
 # Test FlashAttention (optional)
 python -c "from flash_attn import flash_attn_func; print('FlashAttention installed successfully')"

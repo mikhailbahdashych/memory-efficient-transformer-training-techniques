@@ -46,7 +46,8 @@ class PositionalEncoding(nn.Module):
         Returns:
             Tensor with positional encoding added
         """
-        x = x + self.pe[:, :x.size(1), :]
+        # Cast positional encoding to match input dtype (important for BF16/FP16)
+        x = x + self.pe[:, :x.size(1), :].to(x.dtype)
         return self.dropout(x)
 
 
@@ -379,11 +380,16 @@ class TransformerLanguageModel(nn.Module):
 
         # Embed tokens and add positional encoding
         # (batch_size, seq_len) -> (batch_size, seq_len, d_model)
-        x = self.embedding(input_ids) * math.sqrt(self.d_model)
+        x = self.embedding(input_ids)
+        # Scale embeddings (use tensor multiplication to preserve dtype)
+        x = x * math.sqrt(self.d_model)
         x = self.pos_encoding(x)
 
         # Create causal mask (not needed for FlashAttention with causal=True)
-        mask = None if self.use_flash_attn else self._generate_square_subsequent_mask(seq_len).to(device)
+        if self.use_flash_attn:
+            mask = None
+        else:
+            mask = self._generate_square_subsequent_mask(seq_len).to(device)
 
         # Pass through transformer layers
         for layer in self.layers:

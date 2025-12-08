@@ -152,10 +152,10 @@ def print_optimization_summary(results: Dict):
 
         if 'optimizations' in metrics:
             opts = metrics['optimizations']
-            bf16 = '✓' if opts.get('bf16') else '✗'
-            flash = '✓' if opts.get('flash_attn') else '✗'
-            gradcp = '✓' if opts.get('gradient_checkpointing') else '✗'
-            window = str(opts.get('window_size')) if opts.get('window_size') else '✗'
+            bf16 = '+' if opts.get('bf16') else '-'
+            flash = '+' if opts.get('flash_attn') else '-'
+            gradcp = '+' if opts.get('gradient_checkpointing') else '-'
+            window = str(opts.get('window_size')) if opts.get('window_size') else '-'
 
             print(f"{technique_name:<20} {bf16:<8} {flash:<8} {gradcp:<10} {window:<10}")
 

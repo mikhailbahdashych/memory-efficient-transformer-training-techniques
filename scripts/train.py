@@ -58,7 +58,7 @@ def train_epoch(
 
         # Forward pass with optional BF16 autocast
         if use_bf16:
-            with torch.cuda.amp.autocast(dtype=torch.bfloat16):
+            with torch.amp.autocast('cuda', dtype=torch.bfloat16):
                 outputs = model(inputs)
                 # Calculate loss
                 batch_size, seq_len, vocab_size = outputs.shape

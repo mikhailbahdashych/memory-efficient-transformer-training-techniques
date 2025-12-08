@@ -163,6 +163,7 @@ def train(
 
     # Load data
     print("\nLoading preprocessed data...")
+    num_workers = getattr(config, 'num_workers', 4)  # Default to 4 if not specified
     train_loader, val_loader, test_loader, tokenizer = create_dataloaders(
         config.data_processed_dir,
         dataset,
@@ -170,6 +171,7 @@ def train(
         config.eval_batch_size,
         config.max_seq_length,
         config.device,
+        num_workers=num_workers,
     )
 
     print(f"Train batches: {len(train_loader)}")

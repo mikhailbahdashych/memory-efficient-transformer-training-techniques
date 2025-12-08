@@ -114,7 +114,7 @@ def create_dataloaders(
     eval_batch_size: int,
     max_length: int,
     device: str,
-    num_workers: int = 0,
+    num_workers: int = 4,
 ):
     """
     Create dataloaders for training, validation, and testing.
@@ -127,7 +127,7 @@ def create_dataloaders(
         eval_batch_size: Batch size for evaluation
         max_length: Maximum sequence length
         device: Device to use ('cuda', 'cpu', 'mps')
-        num_workers: Number of worker processes
+        num_workers: Number of worker processes (default 4 for parallel data loading)
 
     Returns:
         train_loader, val_loader, test_loader, tokenizer

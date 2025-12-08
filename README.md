@@ -186,141 +186,179 @@ python scripts/preprocess_data.py \
 
 ### **STEP 3: Run Experiments**
 
-You have two options: run individual experiments or automate all experiments.
+According to assignment requirements, you need to run a **systematic comparison** with:
+- **5 optimization techniques** (Baseline, BF16, FlashAttention, Windowed Attention, Gradient Checkpointing)
+- **3 batch sizes** per technique: 32, 64, 128
+- **2 window sizes** for windowed attention: seq_len/4 (64) and seq_len/2 (128)
 
-#### Option A: Run All Experiments Automatically (Recommended)
+**Total experiments: 18** (5 techniques × 3 batch sizes, with windowed attention testing 2 window sizes)
+
+---
+
+#### **Complete Experiment List (Copy-Paste Ready)**
+
+Run these commands in order. Each experiment takes ~15-25 minutes.
+
+##### **1. Baseline (FP32/TF32) - 3 batch sizes**
 
 ```bash
-python scripts/run_experiments.py
+# Baseline with BS=32
+python scripts/train.py --technique baseline_bs32 --batch-size 32
+
+# Baseline with BS=64
+python scripts/train.py --technique baseline_bs64 --batch-size 64
+
+# Baseline with BS=128
+python scripts/train.py --technique baseline_bs128 --batch-size 128
 ```
 
-This runs all experiments sequentially with proper technique names for easy comparison.
+##### **2. BF16 Mixed Precision - 3 batch sizes**
 
-**Time estimate:** 3-6 hours for all experiments (depends on dataset size and GPU)
-
-**Run specific experiments only:**
 ```bash
-# Only run baseline and BF16
-python scripts/run_experiments.py --only baseline bf16
+# BF16 with BS=32
+python scripts/train.py --bf16 --technique bf16_bs32 --batch-size 32
 
-# Run all except windowed attention
-python scripts/run_experiments.py --skip window_512 window_256
+# BF16 with BS=64
+python scripts/train.py --bf16 --technique bf16_bs64 --batch-size 64
+
+# BF16 with BS=128
+python scripts/train.py --bf16 --technique bf16_bs128 --batch-size 128
 ```
 
-#### Option B: Run Individual Experiments
+##### **3. FlashAttention (with BF16) - 3 batch sizes**
 
-**Experiment 0: Baseline (FP32/TF32)**
 ```bash
-python scripts/train.py --technique baseline
+# FlashAttention with BS=32
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs32 --batch-size 32
+
+# FlashAttention with BS=64
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs64 --batch-size 64
+
+# FlashAttention with BS=128
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs128 --batch-size 128
 ```
 
-**Experiment 1: BF16 Mixed Precision**
+##### **4. Windowed Attention - 2 windows × 3 batch sizes = 6 experiments**
+
+**Window = 64 (seq_len / 4):**
 ```bash
-python scripts/train.py --bf16 --technique bf16
+# Window=64, BS=32
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs32 --batch-size 32
+
+# Window=64, BS=64
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs64 --batch-size 64
+
+# Window=64, BS=128
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs128 --batch-size 128
 ```
 
-**Experiment 2: FlashAttention**
+**Window = 128 (seq_len / 2):**
 ```bash
-python scripts/train.py --flash-attn --bf16 --technique bf16_flash
+# Window=128, BS=32
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs32 --batch-size 32
+
+# Window=128, BS=64
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs64 --batch-size 64
+
+# Window=128, BS=128
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs128 --batch-size 128
 ```
 
-**Experiment 3: Windowed Attention**
+##### **5. Gradient Checkpointing (Baseline only) - 3 batch sizes**
 
-To properly demonstrate windowed attention effects, test multiple window sizes:
+**Note:** Per assignment requirements, gradient checkpointing is only tested on baseline (FP32), not combined with other optimizations.
 
 ```bash
-# Window = 64 (small window, significant memory savings, quality loss)
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64
+# Gradient Checkpointing with BS=32
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs32 --batch-size 32
 
-# Window = 128 (medium window, moderate memory savings, minor quality loss)
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128
+# Gradient Checkpointing with BS=64
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs64 --batch-size 64
 
-# Window = 256 (large window, minimal savings for seq_len=256)
-python scripts/train.py --flash-attn --bf16 --window-size 256 --technique bf16_window256
-
-# Window = 512 (no benefit, window >= sequence length)
-python scripts/train.py --flash-attn --bf16 --window-size 512 --technique bf16_window512
-```
-
-**Window Size Selection Guide:**
-
-| Window Size | For seq_len=256 | Memory Savings | Quality Impact | Use Case |
-|-------------|-----------------|----------------|----------------|----------|
-| 64 | Significant windowing | High (~30-40%) | Medium (PPL ↑ ~5-10%) | Extreme memory constraints |
-| 128 | Moderate windowing | Medium (~15-25%) | Low (PPL ↑ ~2-5%) | Balanced trade-off |
-| 256 | Minimal windowing | Low (~5%) | Negligible | Matches sequence length |
-| 512 | No windowing | None | None | Window > sequence (useless) |
-
-**Rule of thumb:** Window should be **< sequence_length** to see real effects. Recommended: window = seq_len / 2 or seq_len / 4.
-
-**Experiment 4: Gradient Checkpointing**
-```bash
-# FP32 with gradient checkpointing
-python scripts/train.py --gradient-checkpointing --technique gradcp
-
-# BF16 with gradient checkpointing (recommended)
-python scripts/train.py --bf16 --gradient-checkpointing --technique bf16_gradcp
-
-# FlashAttention with gradient checkpointing (maximum optimization)
-python scripts/train.py --flash-attn --bf16 --gradient-checkpointing --technique bf16_flash_gradcp
+# Gradient Checkpointing with BS=128
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs128 --batch-size 128
 ```
 
 ---
 
-### **Complete Experiment Reference**
+#### **Experiment Summary Table**
 
-Here's a comprehensive list of all recommended experiments with explicit `--technique` names for easy comparison:
+| # | Technique | Window | Batch Sizes | Total Runs | Technique Names |
+|---|-----------|--------|-------------|------------|-----------------|
+| 1 | Baseline (FP32) | N/A | 32, 64, 128 | 3 | `baseline_bs32/64/128` |
+| 2 | BF16 | N/A | 32, 64, 128 | 3 | `bf16_bs32/64/128` |
+| 3 | FlashAttention | N/A | 32, 64, 128 | 3 | `bf16_flash_bs32/64/128` |
+| 4 | Windowed (64) | 64 | 32, 64, 128 | 3 | `bf16_window64_bs32/64/128` |
+| 5 | Windowed (128) | 128 | 32, 64, 128 | 3 | `bf16_window128_bs32/64/128` |
+| 6 | Gradient Checkpointing | N/A | 32, 64, 128 | 3 | `gradcp_bs32/64/128` |
+| **Total** | **6 configurations** | | | **18 experiments** | |
 
-#### **Core Required Experiments (TASK.md):**
+**Time estimate:** 18 experiments × 20 minutes = **~6 hours total**
 
-```bash
-# 0. Baseline (FP32/TF32)
-python scripts/train.py --technique baseline
+---
 
-# 1. BF16 Mixed Precision
-python scripts/train.py --bf16 --technique bf16
+#### **Why These Specific Settings?**
 
-# 2. FlashAttention (requires BF16)
-python scripts/train.py --flash-attn --bf16 --technique bf16_flash
+**Batch Sizes (32, 64, 128):**
+- Tests how each optimization scales with batch size
+- 128 is maximum that baseline can fit
+- Shows memory/speed trade-offs at different batch sizes
 
-# 3. Windowed Attention - Small window (shows real effects)
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128
+**Window Sizes (64, 128 only):**
+- **64 = seq_len / 4**: Aggressive windowing, significant memory savings
+- **128 = seq_len / 2**: Moderate windowing, balance between memory and quality
+- **Why not 256/512?** Window ≥ sequence length provides no benefit (equivalent to full attention)
 
-# 4. Gradient Checkpointing
-python scripts/train.py --gradient-checkpointing --technique gradcp
-python scripts/train.py --bf16 --gradient-checkpointing --technique bf16_gradcp
-```
+**Gradient Checkpointing (Baseline only):**
+- Tests pure gradient checkpointing effect without other optimizations
+- Shows memory vs compute trade-off in isolation
+- Per assignment requirements, not combined with BF16/FlashAttention
 
-#### **Additional Experiments (for complete analysis):**
+---
 
-```bash
-# Windowed attention - Large windows (for comparison)
-python scripts/train.py --flash-attn --bf16 --window-size 256 --technique bf16_window256
-python scripts/train.py --flash-attn --bf16 --window-size 512 --technique bf16_window512
-
-# Combined optimizations
-python scripts/train.py --flash-attn --bf16 --gradient-checkpointing --technique bf16_flash_gradcp
-```
-
-#### **Maximum Batch Size Experiments (REQUIRED for report):**
-
-After finding max batch size for each technique, re-run with `_maxbs` suffix:
+#### **Quick Copy-Paste: All 18 Experiments**
 
 ```bash
-# Example: if baseline maxes out at BS=192
-python scripts/train.py --technique baseline_maxbs --batch-size 192
+# === BASELINE (FP32) - 3 experiments ===
+python scripts/train.py --technique baseline_bs32 --batch-size 32
+python scripts/train.py --technique baseline_bs64 --batch-size 64
+python scripts/train.py --technique baseline_bs128 --batch-size 128
 
-# Example: if BF16 allows BS=384
-python scripts/train.py --bf16 --technique bf16_maxbs --batch-size 384
+# === BF16 - 3 experiments ===
+python scripts/train.py --bf16 --technique bf16_bs32 --batch-size 32
+python scripts/train.py --bf16 --technique bf16_bs64 --batch-size 64
+python scripts/train.py --bf16 --technique bf16_bs128 --batch-size 128
 
-# Repeat for each technique with its maximum batch size
+# === FLASHATTENTION - 3 experiments ===
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs128 --batch-size 128
+
+# === WINDOWED ATTENTION (window=64) - 3 experiments ===
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs128 --batch-size 128
+
+# === WINDOWED ATTENTION (window=128) - 3 experiments ===
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs128 --batch-size 128
+
+# === GRADIENT CHECKPOINTING (baseline only) - 3 experiments ===
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs32 --batch-size 32
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs64 --batch-size 64
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs128 --batch-size 128
 ```
 
-**Naming Convention:**
-- Base experiments: `baseline`, `bf16`, `bf16_flash`, etc.
-- Max batch size: add `_maxbs` suffix (e.g., `bf16_flash_maxbs`)
-- This allows easy comparison in `compare_results.py`
+**Option A: Run all experiments automatically (recommended):**
+```bash
+chmod +x run_all_experiments.sh
+./run_all_experiments.sh
+```
+
+**Option B: Run experiments manually (copy-paste commands above)**
+
+**Note:** The automated script (`run_all_experiments.sh`) includes progress tracking and will automatically generate the comparison report when done.
 
 ---
 
@@ -600,55 +638,58 @@ ImportError: cannot import name 'flash_attn_func'
 
 ## Quick Reference
 
-### **All Experiments - Copy-Paste Ready**
+### **All 18 Required Experiments - Copy-Paste Ready**
 
 ```bash
 # ============================================
-# CORE REQUIRED EXPERIMENTS (BS=128)
+# BASELINE (FP32) - 3 batch sizes
 # ============================================
-
-# 0. Baseline (FP32/TF32)
-python scripts/train.py --technique baseline
-
-# 1. BF16 Mixed Precision
-python scripts/train.py --bf16 --technique bf16
-
-# 2. FlashAttention
-python scripts/train.py --flash-attn --bf16 --technique bf16_flash
-
-# 3. Windowed Attention (test multiple windows)
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128
-
-# 4. Gradient Checkpointing
-python scripts/train.py --gradient-checkpointing --technique gradcp
-python scripts/train.py --bf16 --gradient-checkpointing --technique bf16_gradcp
-
-# 5. Combined (optional but recommended)
-python scripts/train.py --flash-attn --bf16 --gradient-checkpointing --technique bf16_flash_gradcp
+python scripts/train.py --technique baseline_bs32 --batch-size 32
+python scripts/train.py --technique baseline_bs64 --batch-size 64
+python scripts/train.py --technique baseline_bs128 --batch-size 128
 
 # ============================================
-# MAXIMUM BATCH SIZE EXPERIMENTS (REQUIRED!)
+# BF16 MIXED PRECISION - 3 batch sizes
 # ============================================
-# After running above, find max BS for each technique
-# Then re-run with _maxbs suffix and appropriate batch size
+python scripts/train.py --bf16 --technique bf16_bs32 --batch-size 32
+python scripts/train.py --bf16 --technique bf16_bs64 --batch-size 64
+python scripts/train.py --bf16 --technique bf16_bs128 --batch-size 128
 
-# Example workflow for finding max batch size:
-# 1. Start with BS=128, double until OOM
-# 2. Binary search to find exact maximum
-# 3. Re-run with _maxbs technique name
+# ============================================
+# FLASHATTENTION - 3 batch sizes
+# ============================================
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs128 --batch-size 128
 
-# Example (adjust batch sizes based on your GPU):
-python scripts/train.py --technique baseline_maxbs --batch-size 128
-python scripts/train.py --bf16 --technique bf16_maxbs --batch-size 256
-python scripts/train.py --flash-attn --bf16 --technique bf16_flash_maxbs --batch-size 320
-# ... repeat for all techniques
+# ============================================
+# WINDOWED ATTENTION (window=64) - 3 batch sizes
+# ============================================
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs128 --batch-size 128
+
+# ============================================
+# WINDOWED ATTENTION (window=128) - 3 batch sizes
+# ============================================
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs128 --batch-size 128
+
+# ============================================
+# GRADIENT CHECKPOINTING (baseline only) - 3 batch sizes
+# ============================================
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs32 --batch-size 32
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs64 --batch-size 64
+python scripts/train.py --gradient-checkpointing --technique gradcp_bs128 --batch-size 128
 
 # ============================================
 # COMPARE ALL RESULTS
 # ============================================
 python scripts/compare_results.py
 ```
+
+**Total:** 18 experiments × ~20 minutes = ~6 hours
 
 ### **Complete Workflow (Setup to Results)**
 
@@ -687,9 +728,9 @@ python scripts/compare_results.py
 
 **Time estimates:**
 - Setup (steps 1-3): 30-45 minutes
-- Core experiments (BS=128): 3-5 hours
-- Max batch size experiments: 2-4 hours
-- **Total: 6-10 hours**
+- All 18 experiments: ~6 hours (18 × 20 min)
+- Comparison and analysis: 10-15 minutes
+- **Total: ~7 hours**
 
 ---
 

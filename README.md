@@ -88,11 +88,24 @@ This project systematically compares **5 memory optimization techniques** for Tr
 uv sync
 
 # Install FlashAttention (required for experiments 2-4)
-# This may take several minutes to compile
+# Option A: From source (may take several minutes to compile)
 pip install flash-attn --no-build-isolation
+
+# Option B: Pre-built wheels (faster, recommended for specific configurations)
+# For Python 3.12.3, PyTorch 2.9.1+cu128, CUDA 12.8:
+uv pip install https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.5.4/flash_attn-2.8.3+cu128torch2.9-cp312-cp312-linux_x86_64.whl
 ```
 
-**Note:** FlashAttention requires CUDA and may need compilation. Check [flash-attn documentation](https://github.com/Dao-AILab/flash-attention) for pre-built wheels for your CUDA version.
+**Environment Used in This Project:**
+- Python: 3.12.3
+- PyTorch: 2.9.1+cu128
+- CUDA: 12.8.9
+- FlashAttention: 2.8.3 (pre-built wheel)
+
+**Note:** FlashAttention requires CUDA and may need compilation if installing from source. For faster installation, use pre-built wheels matching your Python/PyTorch/CUDA versions:
+- Check your configuration: `python -c "import torch; print(f'Python: {torch.__version__}, CUDA: {torch.version.cuda}')"`
+- Find pre-built wheels: [flash-attention-prebuild-wheels](https://github.com/mjun0812/flash-attention-prebuild-wheels/releases)
+- Official documentation: [flash-attn repository](https://github.com/Dao-AILab/flash-attention)
 
 ### Step 2: Verify Installation
 
@@ -642,6 +655,12 @@ python scripts/compare_results.py
 ```bash
 # 1. Install dependencies
 uv sync
+
+# Install FlashAttention (choose one):
+# Option A: Pre-built wheel (recommended, faster)
+uv pip install https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.5.4/flash_attn-2.8.3+cu128torch2.9-cp312-cp312-linux_x86_64.whl
+
+# Option B: From source (if pre-built not available)
 pip install flash-attn --no-build-isolation
 
 # 2. Download dataset

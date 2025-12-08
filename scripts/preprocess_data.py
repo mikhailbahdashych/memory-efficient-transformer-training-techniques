@@ -18,7 +18,7 @@ from utils.dataset import load_text_file, load_jsonl_file, split_data
 
 def preprocess_data(
     input_file: Path,
-    config_type: str = "rnn",
+    config_type: str = "transformer",
     file_type: str = "txt",
     text_field: str = "text",
     tokenizer_type: str = None,
@@ -28,7 +28,7 @@ def preprocess_data(
 
     Args:
         input_file: Path to input data file
-        config_type: Type of config ('rnn' or 'transformer')
+        config_type: Type of config ('transformer')
         file_type: Type of input file ('txt' or 'jsonl')
         text_field: Field name for JSONL files
         tokenizer_type: Type of tokenizer ('bpe' or 'gpt2'), if None uses config default
@@ -158,13 +158,6 @@ def main():
         help="Path to input data file",
     )
     parser.add_argument(
-        "--config",
-        type=str,
-        default="rnn",
-        choices=["rnn", "transformer"],
-        help="Configuration type",
-    )
-    parser.add_argument(
         "--file-type",
         type=str,
         default="txt",
@@ -194,7 +187,6 @@ def main():
 
     preprocess_data(
         input_file=input_path,
-        config_type=args.config,
         file_type=args.file_type,
         text_field=args.text_field,
         tokenizer_type=args.tokenizer_type,

@@ -242,12 +242,15 @@ def train(
     )
 
     print("\nEvaluating on validation set...")
+    # Use BF16 for evaluation if FlashAttention is enabled (required for FlashAttention)
+    eval_use_bf16 = config.use_bf16 or config.use_flash_attn
     val_loss, val_ppl = evaluate_model(
         model=model,
         dataloader=val_loader,
         criterion=criterion,
         device=config.device,
         pad_token_id=tokenizer.pad_token_id,
+        use_bf16=eval_use_bf16,
     )
 
     train_ppl = calculate_perplexity(train_loss)

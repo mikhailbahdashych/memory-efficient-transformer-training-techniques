@@ -57,12 +57,12 @@ def find_max_batch_size(
         if fits:
             best_batch_size = mid
             if verbose:
-                print("✓ Fits")
+                print("+ Fits")
             # Try larger
             left = mid + 1
         else:
             if verbose:
-                print("✗ OOM")
+                print("- OOM")
             # Try smaller
             right = mid - 1
 
@@ -222,13 +222,13 @@ def find_max_batch_size_with_dataloader(
             # If we got here, it fits
             best_batch_size = mid
             if verbose:
-                print("✓ Fits")
+                print("+ Fits")
             left = mid + 1
 
         except RuntimeError as e:
             if "out of memory" in str(e).lower():
                 if verbose:
-                    print("✗ OOM")
+                    print("- OOM")
                 right = mid - 1
             else:
                 raise e

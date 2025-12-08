@@ -174,10 +174,10 @@ def run_all_experiments(
                 'elapsed_time': elapsed,
             }
 
-            print(f"\n✓ Experiment '{exp_name}' completed in {elapsed/60:.2f} minutes")
+            print(f"\n+ Experiment '{exp_name}' completed in {elapsed/60:.2f} minutes")
 
         except Exception as e:
-            print(f"\n✗ Experiment '{exp_name}' failed: {str(e)}")
+            print(f"\n- Experiment '{exp_name}' failed: {str(e)}")
             failed_experiments.append(exp_name)
             results[exp_name] = {
                 'success': False,
@@ -193,12 +193,12 @@ def run_all_experiments(
     print(f"\nSuccessful experiments: {len(successful)}/{len(experiments)}")
     for name in successful:
         metrics = results[name]['metrics']
-        print(f"  ✓ {name}: PPL={metrics['val_perplexity']:.2f}, Time={results[name]['elapsed_time']/60:.2f}m")
+        print(f"  + {name}: PPL={metrics['val_perplexity']:.2f}, Time={results[name]['elapsed_time']/60:.2f}m")
 
     if failed_experiments:
         print(f"\nFailed experiments: {len(failed_experiments)}")
         for name in failed_experiments:
-            print(f"  ✗ {name}: {results[name]['error']}")
+            print(f"  - {name}: {results[name]['error']}")
 
     # Save summary
     config = TransformerConfig()

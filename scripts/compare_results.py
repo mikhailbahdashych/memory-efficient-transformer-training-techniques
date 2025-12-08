@@ -264,14 +264,38 @@ def main():
 
     print(f"Found {len(results)} experiments")
 
-    # Print comparisons
+    # Redirect output to file
+    comparison_path = results_dir / "comparison_report.txt"
+
+    # Save to file
+    import io
+    output = io.StringIO()
+
+    # Capture all print output
+    original_stdout = sys.stdout
+    sys.stdout = output
+
+    # Print comparisons (these will be captured)
+    print(f"Loading results from: {results_dir}")
+    print(f"Found {len(results)} experiments")
     print_comparison_table(results)
     print_memory_comparison(results)
     print_optimization_summary(results)
     analyze_results(results)
 
-    # Save comparison to file
-    comparison_path = results_dir / "comparison_report.txt"
+    # Restore stdout
+    sys.stdout = original_stdout
+
+    # Get captured output
+    report_content = output.getvalue()
+
+    # Print to console
+    print(report_content)
+
+    # Write to file
+    with open(comparison_path, 'w') as f:
+        f.write(report_content)
+
     print(f"\nComparison report saved to: {comparison_path}")
 
 

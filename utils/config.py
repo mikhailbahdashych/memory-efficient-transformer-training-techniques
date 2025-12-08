@@ -27,7 +27,7 @@ class Config:
 
     # Data processing
     vocab_size: int = 10000
-    max_seq_length: int = 512  # Increased for GPU
+    max_seq_length: int = 256  # Reduced to 256 for memory efficiency
     train_split: float = 0.85
     val_split: float = 0.10
     test_split: float = 0.05
@@ -37,7 +37,7 @@ class Config:
     min_frequency: int = 2
 
     # Training hyperparameters (GPU-optimized)
-    batch_size: int = 64  # Larger batch size for RTX 5090
+    batch_size: int = 16  # Reduced for large vocab (GPT-2 = 50k tokens)
     num_epochs: int = 1  # Lab 4: Only train for 1 epoch
     learning_rate: float = 0.001
     weight_decay: float = 0.01
@@ -47,7 +47,7 @@ class Config:
     save_every_n_epochs: int = 1
 
     # Evaluation
-    eval_batch_size: int = 64
+    eval_batch_size: int = 16  # Match training batch size
 
     def __post_init__(self):
         """Create directories if they don't exist."""
@@ -60,11 +60,13 @@ class Config:
 class TransformerConfig(Config):
     """Configuration for Transformer model with memory optimization options."""
 
-    # Model architecture (optimized for RTX 5090)
-    embedding_dim: int = 512  # Increased from 256
+    # Model architecture (conservative for large vocab size)
+    # NOTE: With GPT-2 tokenizer (vocab=50257), memory usage is much higher!
+    # These settings are balanced for both BPE (vocab=10k) and GPT-2 (vocab=50k)
+    embedding_dim: int = 256  # Reduced to 256 for memory efficiency
     num_heads: int = 8
-    num_layers: int = 6  # Increased from 4
-    ff_dim: int = 2048  # Increased from 1024
+    num_layers: int = 4  # Reduced to 4 layers
+    ff_dim: int = 1024  # Reduced to 1024
     dropout: float = 0.1
 
     # Memory optimization flags

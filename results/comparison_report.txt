@@ -1,0 +1,86 @@
+Loading results from: /Users/mikhail.bahdashych/Studies/II SEMESTR/LO/LABS/LAB4 01.12.2025/results
+Found 18 experiments
+
+========================================================================================================================
+EXPERIMENT COMPARISON TABLE
+========================================================================================================================
+Technique            Batch Size   Val PPL      Train Time      Peak Mem (MB)   Parameters  
+------------------------------------------------------------------------------------------------------------------------
+forum_poradnikogrodniczy_pl_corpus_baseline_bs128 128          14.96        295.6s          19594.56        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_baseline_bs32 32           14.85        743.8s          5277.19         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_baseline_bs64 64           14.75        375.4s          10084.91        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_bs128 128          15.04        218.3s          11734.80        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_bs32 32           14.75        746.9s          3691.21         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_bs64 64           14.78        378.1s          6271.38         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs128 128          15.05        147.6s          10070.63        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs32 32           14.83        281.5s          3216.56         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs64 64           14.83        169.4s          5564.44         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs128 128          14.95        142.6s          10149.24        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs32 32           14.82        178.0s          3166.43         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs64 64           14.79        153.7s          5524.18         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs128 128          14.97        142.8s          9892.46         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs32 32           14.73        179.1s          3275.84         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs64 64           14.79        153.2s          5470.98         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs128 128          15.05        344.9s          15101.68        28,941,393  
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs32 32           14.77        775.4s          4177.03         28,941,393  
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs64 64           14.81        399.3s          7804.41         28,941,393  
+========================================================================================================================
+
+====================================================================================================
+MEMORY USAGE COMPARISON
+====================================================================================================
+Technique            Forward (MB)    Backward (MB)   Peak (MB)       Step Time (s)  
+----------------------------------------------------------------------------------------------------
+forum_poradnikogrodniczy_pl_corpus_baseline_bs128 12700.98        6719.27         19594.56        0.0551         
+forum_poradnikogrodniczy_pl_corpus_baseline_bs32 3440.08         2025.43         5277.19         0.0620         
+forum_poradnikogrodniczy_pl_corpus_baseline_bs64 6532.53         3589.91         10084.91        0.0445         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs128 9059.24         3590.17         11734.80        0.0471         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs32 2556.53         1243.26         3691.21         0.0656         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs64 4724.26         2025.56         6271.38         0.0592         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs128 7283.16         3590.17         10070.63        0.0339         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs32 2106.60         1243.26         3216.56         0.0240         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs64 3831.85         2025.56         5564.44         0.0248         
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs128 7282.76         3590.17         10149.24        0.0260         
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs32 2106.62         1243.26         3166.43         0.0100         
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs64 3832.02         2025.56         5524.18         0.0149         
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs128 7282.26         3590.17         9892.46         0.0260         
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs32 2106.71         1243.26         3275.84         0.0101         
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs64 3832.01         2025.56         5470.98         0.0148         
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs128 8303.15         6720.27         15101.68        0.0646         
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs32 2339.25         2026.43         4177.03         0.0673         
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs64 4327.20         3590.91         7804.41         0.0509         
+====================================================================================================
+
+================================================================================
+OPTIMIZATION TECHNIQUES SUMMARY
+================================================================================
+Technique            BF16     Flash    GradCP     Window    
+--------------------------------------------------------------------------------
+forum_poradnikogrodniczy_pl_corpus_baseline_bs128 -        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_baseline_bs32 -        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_baseline_bs64 -        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs128 +        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs32 +        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_bs64 +        -        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs128 +        +        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs32 +        +        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_flash_bs64 +        +        -          -         
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs128 +        +        -          16        
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs32 +        +        -          16        
+forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs64 +        +        -          16        
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs128 +        +        -          32        
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs32 +        +        -          32        
+forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs64 +        +        -          32        
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs128 -        -        +          -         
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs32 -        -        +          -         
+forum_poradnikogrodniczy_pl_corpus_gradcp_bs64 -        -        +          -         
+================================================================================
+
+================================================================================
+ANALYSIS
+================================================================================
+
+Best validation perplexity: 14.73 (forum_poradnikogrodniczy_pl_corpus_bf16_window32_bs32)
+Fastest training: 142.6s (forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs128)
+Lowest peak memory: 3166.43 MB (forum_poradnikogrodniczy_pl_corpus_bf16_window16_bs32)
+================================================================================

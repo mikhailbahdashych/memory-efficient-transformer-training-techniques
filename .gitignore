@@ -27,16 +27,6 @@ data/wikipedia/*.jsonl
 checkpoints/*.pt
 checkpoints/*.pth
 
-# Results
-results/*.txt
-results/*.png
-results/*.json
-results/*.csv
-results/plots/*.png
-
 # Speakleash metadata cache
 speakleash_datasets_metadata/
 
-CLAUDE.md
-.claude
-TASK.md

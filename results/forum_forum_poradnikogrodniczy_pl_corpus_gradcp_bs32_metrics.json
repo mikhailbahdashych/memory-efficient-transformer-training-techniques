@@ -1,0 +1,50 @@
+{
+  "technique": "gradcp_bs32",
+  "dataset": "forum_forum_poradnikogrodniczy_pl_corpus",
+  "train_loss": 2.6982577538614176,
+  "val_loss": 2.692915636734059,
+  "train_perplexity": 14.853830139752215,
+  "val_perplexity": 14.774690813339147,
+  "training_time_seconds": 775.3742158412933,
+  "num_parameters": 28941393,
+  "batch_size": 32,
+  "model_config": {
+    "embedding_dim": 256,
+    "num_heads": 8,
+    "num_layers": 4,
+    "ff_dim": 1024,
+    "max_seq_length": 256
+  },
+  "optimizations": {
+    "bf16": false,
+    "flash_attn": false,
+    "gradient_checkpointing": true,
+    "window_size": null
+  },
+  "memory_profiling": {
+    "warmup_steps": 20,
+    "recorded_steps": 11124,
+    "memory_mb": {
+      "forward_pass": {
+        "mean": 2339.2492964606367,
+        "max": 2612.5,
+        "min": 1651.62255859375
+      },
+      "backward_pass": {
+        "mean": 2026.4301684947804,
+        "max": 2026.48291015625,
+        "min": 1439.78466796875
+      },
+      "peak_per_step": {
+        "mean": 3903.670945097242,
+        "max": 4177.03125,
+        "min": 2925.431640625
+      }
+    },
+    "timing_seconds": {
+      "mean_step_time": 0.06730020243415984,
+      "total_time": 748.647451877594,
+      "steps_per_second": 14.858796316078033
+    }
+  }
+}

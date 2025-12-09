@@ -1,0 +1,26 @@
+{
+  "warmup_steps": 20,
+  "recorded_steps": 2766,
+  "memory_mb": {
+    "forward_pass": {
+      "mean": 8303.150764161921,
+      "max": 8843.265625,
+      "min": 7491.5830078125
+    },
+    "backward_pass": {
+      "mean": 6720.270649918937,
+      "max": 6720.48291015625,
+      "min": 6133.37109375
+    },
+    "peak_per_step": {
+      "mean": 14561.242935279963,
+      "max": 15101.67822265625,
+      "min": 13162.78271484375
+    }
+  },
+  "timing_seconds": {
+    "mean_step_time": 0.06460036872869286,
+    "total_time": 178.68461990356445,
+    "steps_per_second": 15.4797878043046
+  }
+}

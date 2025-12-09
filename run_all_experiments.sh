@@ -10,8 +10,6 @@
 # - 3 batch sizes each (32, 64, 128)
 # - 2 window sizes for windowed attention
 #
-# Total: 18 experiments × ~20 minutes = ~6 hours
-#
 # ============================================
 
 set -e  # Exit on error
@@ -98,15 +96,15 @@ echo "=========================================="
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=32..."
-python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window16_bs32 --batch-size 32
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=64..."
-python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window16_bs64 --batch-size 64
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=128..."
-python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs128 --batch-size 128
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window16_bs128 --batch-size 128
 
 # ============================================
 # WINDOWED ATTENTION (window=32) - 3 experiments
@@ -118,15 +116,15 @@ echo "=========================================="
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=32..."
-python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs32 --batch-size 32
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window32_bs32 --batch-size 32
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=64..."
-python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs64 --batch-size 64
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window32_bs64 --batch-size 64
 
 CURRENT=$((CURRENT + 1))
 echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=128..."
-python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs128 --batch-size 128
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window32_bs128 --batch-size 128
 
 # ============================================
 # GRADIENT CHECKPOINTING - 3 experiments
@@ -158,18 +156,4 @@ echo "=========================================="
 echo ""
 echo "Generating comparison report..."
 python scripts/compare_results.py
-
-echo ""
-echo "=========================================="
-echo "DONE!"
-echo "=========================================="
-echo ""
-echo "Results saved in:"
-echo "  - results/*_metrics.json (individual experiment results)"
-echo "  - results/comparison_report.txt (comparison table)"
-echo ""
-echo "Next steps:"
-echo "  1. Review results/comparison_report.txt"
-echo "  2. Analyze memory vs batch size trade-offs"
-echo "  3. Write your report with findings"
-echo ""
+python scripts/generate_plots.py

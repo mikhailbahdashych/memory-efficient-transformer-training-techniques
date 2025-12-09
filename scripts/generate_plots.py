@@ -37,11 +37,15 @@ def extract_technique_name(technique_name: str):
     Extract display name from technique string.
 
     Examples:
-        'baseline' -> 'Baseline (FP32)'
-        'bf16' -> 'BF16'
-        'bf16_flash' -> 'FlashAttention'
-        'bf16_window64' -> 'Window=64'
+        'baseline_bs32' -> 'Baseline (FP32)'
+        'bf16_bs64' -> 'BF16'
+        'bf16_flash_bs128' -> 'FlashAttention'
+        'bf16_window64_bs32' -> 'Window=64'
     """
+    # Strip batch size suffix (_bsXX) if present
+    import re
+    technique_name = re.sub(r'_bs\d+$', '', technique_name)
+
     # Map technique names to display names
     technique_map = {
         'baseline': 'Baseline (FP32)',
@@ -52,7 +56,11 @@ def extract_technique_name(technique_name: str):
 
     # Handle windowed attention
     if 'window' in technique_name:
-        if 'window64' in technique_name:
+        if 'window16' in technique_name:
+            display_name = 'Window=16'
+        elif 'window32' in technique_name:
+            display_name = 'Window=32'
+        elif 'window64' in technique_name:
             display_name = 'Window=64'
         elif 'window128' in technique_name:
             display_name = 'Window=128'

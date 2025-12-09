@@ -89,44 +89,44 @@ echo "[$CURRENT/$TOTAL_EXPERIMENTS] FlashAttention BS=128..."
 python scripts/train.py --flash-attn --bf16 --technique bf16_flash_bs128 --batch-size 128
 
 # ============================================
-# WINDOWED ATTENTION (window=64) - 3 experiments
+# WINDOWED ATTENTION (window=16) - 3 experiments
 # ============================================
 echo ""
 echo "=========================================="
-echo "WINDOWED ATTENTION (window=64) - 3 batch sizes"
+echo "WINDOWED ATTENTION (window=16) - 3 batch sizes"
 echo "=========================================="
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=64 BS=32..."
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs32 --batch-size 32
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=32..."
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs32 --batch-size 32
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=64 BS=64..."
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs64 --batch-size 64
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=64..."
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs64 --batch-size 64
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=64 BS=128..."
-python scripts/train.py --flash-attn --bf16 --window-size 64 --technique bf16_window64_bs128 --batch-size 128
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=16 BS=128..."
+python scripts/train.py --flash-attn --bf16 --window-size 16 --technique bf16_window64_bs128 --batch-size 128
 
 # ============================================
-# WINDOWED ATTENTION (window=128) - 3 experiments
+# WINDOWED ATTENTION (window=32) - 3 experiments
 # ============================================
 echo ""
 echo "=========================================="
-echo "WINDOWED ATTENTION (window=128) - 3 batch sizes"
+echo "WINDOWED ATTENTION (window=32) - 3 batch sizes"
 echo "=========================================="
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=128 BS=32..."
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs32 --batch-size 32
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=32..."
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs32 --batch-size 32
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=128 BS=64..."
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs64 --batch-size 64
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=64..."
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs64 --batch-size 64
 
 CURRENT=$((CURRENT + 1))
-echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=128 BS=128..."
-python scripts/train.py --flash-attn --bf16 --window-size 128 --technique bf16_window128_bs128 --batch-size 128
+echo "[$CURRENT/$TOTAL_EXPERIMENTS] Window=32 BS=128..."
+python scripts/train.py --flash-attn --bf16 --window-size 32 --technique bf16_window128_bs128 --batch-size 128
 
 # ============================================
 # GRADIENT CHECKPOINTING - 3 experiments

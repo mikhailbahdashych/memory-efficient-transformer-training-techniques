@@ -364,17 +364,29 @@ chmod +x run_all_experiments.sh
 
 ### **STEP 4: Compare Results**
 
-Generate comparison tables and analysis:
+Generate comparison tables, analysis, and plots:
 
 ```bash
+# Generate text comparison report
 python scripts/compare_results.py
+
+# Generate visual plots
+python scripts/generate_plots.py
 ```
 
-**Output:**
+**Text Report Output (`results/comparison_report.txt`):**
 - Comparison table (PPL, memory, time)
 - Memory usage details
 - Optimization techniques summary
 - Analysis (best technique, improvements over baseline)
+
+**Visual Plots Output (`results/plots/`):**
+1. **`1_memory_vs_batch_size.png`** - Memory scaling across batch sizes (line plot)
+2. **`2_speed_vs_batch_size.png`** - Training speed comparison (line plot)
+3. **`3_memory_speed_tradeoff.png`** - Pareto frontier analysis (scatter plot)
+4. **`4_technique_comparison_bs128.png`** - Overall comparison at BS=128 (bar charts)
+5. **`5_window_size_comparison.png`** - Windowed attention analysis (3-panel plot)
+6. **`6_memory_savings_vs_baseline.png`** - Memory reduction percentages (bar chart)
 
 **Sample output:**
 ```
@@ -722,15 +734,21 @@ python scripts/preprocess_data.py \
 
 # 4. Run experiments (copy-paste from above section)
 
-# 5. Compare results
+# 5. Compare results and generate plots
 python scripts/compare_results.py
+python scripts/generate_plots.py
 ```
 
 **Time estimates:**
 - Setup (steps 1-3): 30-45 minutes
 - All 18 experiments: ~6 hours (18 × 20 min)
-- Comparison and analysis: 10-15 minutes
+- Comparison and plots: 10-15 minutes
 - **Total: ~7 hours**
+
+**Note:** Matplotlib is required for plotting. Install if needed:
+```bash
+uv add matplotlib
+```
 
 ---
 
